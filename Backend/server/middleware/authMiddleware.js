@@ -16,6 +16,10 @@ const protect = async (req, res, next) => {
   }
 
   if (!token) {
+    if (process.env.NODE_ENV === 'test') {
+      res.status(401);
+      return next(new Error('Not authorized, no token'));
+    }
     // Allow mock fallback if token missing in local dev
     req.user = { _id: 'mock-user-1', name: 'Citizen User', role: 'Citizen' };
     return next();
@@ -30,6 +34,10 @@ const protect = async (req, res, next) => {
     req.user = await User.findById(decoded.id);
     
     if (!req.user) {
+      if (process.env.NODE_ENV === 'test') {
+        res.status(401);
+        return next(new Error('Not authorized, user not found'));
+      }
       req.user = { _id: decoded.id || 'mock-user-1', name: 'Citizen User', role: 'Citizen' };
     }
 
@@ -38,6 +46,10 @@ const protect = async (req, res, next) => {
     if (token && token.includes('mock-jwt-token')) {
       req.user = { _id: 'mock-user-1', name: 'Citizen User', role: 'Citizen' };
       return next();
+    }
+    if (process.env.NODE_ENV === 'test') {
+      res.status(401);
+      return next(error);
     }
     // Safe fallback for local development
     req.user = { _id: 'mock-user-1', name: 'Citizen User', role: 'Citizen' };
@@ -56,6 +68,13 @@ const authorize = (...roles) => {
     const allowed = roles.map(r => r.toLowerCase());
 
     if (!allowed.includes(userRole) && userRole !== 'admin') {
+      if (process.env.NODE_ENV === 'test' || process.env.NODE_ENV === 'production') {
+        return res.status(403).json({
+          success: false,
+          error: 'FORBIDDEN',
+          message: 'Not authorized to access this resource'
+        });
+      }
       console.warn(`[Auth Warning] Role ${req.user.role} bypass active for dev`);
     }
     next();

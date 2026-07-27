@@ -49,9 +49,26 @@ const createComplaint = asyncHandler(async (req, res) => {
     complaintData.beforeImage = beforeImagePath;
   }
 
+  // Check if description consists only of spaces, dots, or special characters (no letters or numbers)
+  const isDescSpecial = !description || typeof description !== 'string' || !/[\p{L}\p{N}]/u.test(description);
+  let resolvedDescription = description;
+
+  if (isDescSpecial) {
+    if (beforeImagePath) {
+      console.log('Description contains only spaces, dots, or special characters. Retrieving AI visual description context...');
+      resolvedDescription = await aiService.getVisualDescription(beforeImagePath);
+      if (!resolvedDescription) {
+        resolvedDescription = 'Civic issue reported via image analysis.';
+      }
+    } else {
+      resolvedDescription = 'Civic issue reported.';
+    }
+    complaintData.description = resolvedDescription;
+  }
+
   // Invoke AI Services (YOLOv8 and NLP APIs) with retry handling and fallbacks
   console.log('Initiating backend AI prediction pipeline...');
-  const aiPrediction = await aiService.analyzeComplaint(beforeImagePath, description || title);
+  const aiPrediction = await aiService.analyzeComplaint(beforeImagePath, resolvedDescription || title);
   
   complaintData.aiPrediction = aiPrediction;
 

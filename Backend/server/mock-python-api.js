@@ -14,16 +14,34 @@ const upload = multer();
 // YOLOv8 Mock Endpoint
 app.post('/predict/image', upload.single('image'), (req, res) => {
   console.log('[Mock Python API] Received YOLOv8 image prediction request');
+  let issue = 'Major Pothole Damage';
+  let confidence = 0.935;
+
   if (req.file) {
     console.log(`[Mock Python API] File details: name=${req.file.originalname}, size=${req.file.size} bytes`);
+    const name = req.file.originalname.toLowerCase();
+
+    if (name.includes('garbage') || name.includes('waste') || name.includes('trash') || name.includes('dump') || name.includes('bin') || name.includes('refuse') || name.includes('litter') || name.includes('scraps')) {
+      issue = 'Garbage Accumulation & Overflow';
+      confidence = 0.948;
+    } else if (name.includes('water') || name.includes('leak') || name.includes('pipe') || name.includes('sewage') || name.includes('flood') || name.includes('drain')) {
+      issue = 'Water Leakage & Pipeline Burst';
+      confidence = 0.962;
+    } else if (name.includes('light') || name.includes('lamp') || name.includes('electric') || name.includes('dark') || name.includes('wire')) {
+      issue = 'Broken Street Light & Dark Zone';
+      confidence = 0.920;
+    } else if (name.includes('tree') || name.includes('branch') || name.includes('park') || name.includes('foliage')) {
+      issue = 'Fallen Tree & Road Blockage';
+      confidence = 0.895;
+    }
   } else {
     console.log('[Mock Python API] Warning: No file received');
   }
 
-  // Return a mock YOLO prediction
+  // Return dynamic YOLO prediction
   res.status(200).json({
-    issue: 'Major Pothole Damage',
-    confidence: 0.935
+    issue,
+    confidence
   });
 });
 

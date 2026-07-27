@@ -8,3 +8,5 @@ database/mongodb/data/*.rs
 database/mongodb/data/WiredTiger*
 database/mongodb/data/journal/
 database/mongodb/data/diagnostic.data/
+Backend/server/uploads/*
+!Backend/server/uploads/.gitkeep

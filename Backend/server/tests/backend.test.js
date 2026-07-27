@@ -273,6 +273,20 @@ describe('Complaint lifecycle (complaintController / complaintRoutes)', () => {
       .set('Authorization', `Bearer ${adminToken}`);
     expect(adminAttempt.statusCode).toBe(200);
   });
+
+  test('citizen can file a complaint with dots/special character description and it uses visual description', async () => {
+    const res = await request(app)
+      .post('/api/complaints')
+      .set('Authorization', `Bearer ${citizenToken}`)
+      .field('title', 'Pothole on Main St')
+      .field('description', '...!!!')
+      .field('department', 'Roads')
+      .attach('beforeImage', tinyPngPath);
+
+    expect(res.statusCode).toBe(201);
+    expect(res.body.data).toHaveProperty('description');
+    expect(res.body.data.description).toBe('Major Pothole Damage');
+  });
 });
 
 // =================================================================

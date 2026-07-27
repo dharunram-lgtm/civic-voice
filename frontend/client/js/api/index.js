@@ -37,3 +37,9 @@ api.interceptors.response.use(
     return Promise.reject(error);
   }
 );
+
+async function requestImageAnalysis(formData) {
+  return api.post('/ai/image-analysis', formData, {
+    headers: { 'Content-Type': 'multipart/form-data' }
+  });
+}

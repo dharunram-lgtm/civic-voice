@@ -17,7 +17,10 @@ const validateCreateComplaint = (req, res, next) => {
     errors.push('Title cannot exceed 100 characters');
   }
 
-  if (!description || typeof description !== 'string' || description.trim() === '') {
+  const hasImage = !!(req.file || (req.files && Object.keys(req.files).length > 0));
+  const isDescEmpty = !description || typeof description !== 'string' || description.trim() === '';
+
+  if (isDescEmpty && !hasImage) {
     errors.push('Description is required and must be a non-empty string');
   }
 
