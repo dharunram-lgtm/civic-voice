@@ -1,5 +1,9 @@
-const API_BASE_URL = 'http://localhost:5000/api';
-const AI_SERVICE_URL = 'http://localhost:8000';
+const API_BASE_URL = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1'
+  ? 'http://localhost:5000/api'
+  : 'https://civicsmart-backend.onrender.com/api';
+const AI_SERVICE_URL = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1'
+  ? 'http://localhost:8000'
+  : 'https://civicsmart-backend.onrender.com/api';
 
 const api = axios.create({
   baseURL: API_BASE_URL,

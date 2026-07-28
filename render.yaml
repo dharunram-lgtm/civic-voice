@@ -1,9 +1,10 @@
 services:
-  # CivicSmart Backend API
+  # Backend API
   - type: web
     name: civicsmart-backend
     env: node
     plan: free
+    rootDir: Backend/server
     buildCommand: npm install
     startCommand: node server.js
     envVars:
@@ -18,8 +19,20 @@ services:
       - key: JWT_EXPIRE
         value: 30d
       - key: CLIENT_URL
-        value: https://civicsmart-portal.onrender.com
+        value: https://civicsmart-frontend.onrender.com
       - key: YOLO_API_URL
         sync: false
       - key: NLP_API_URL
         sync: false
+
+  # Frontend (Static Site)
+  - type: static_site
+    name: civicsmart-frontend
+    plan: free
+    rootDir: frontend
+    buildCommand: ""
+    staticPublishPath: client
+    routes:
+      - type: rewrite
+        source: /*
+        destination: /index.html
